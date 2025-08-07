@@ -5,14 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Trash2, Palette, Thermometer } from 'lucide-react'
+import { Plus, Trash2, Palette, Thermometer, RefreshCw } from 'lucide-react'
 import { ColorRule, temperatureDataSource } from '@/lib/colorRules'
 
-interface ColorRulesPanelProps {
+interface ColorRulesSidebarProps {
   onRulesChange: (rules: ColorRule[]) => void
 }
 
-export default function ColorRulesPanel({ onRulesChange }: ColorRulesPanelProps) {
+export default function ColorRulesSidebar({ onRulesChange }: ColorRulesSidebarProps) {
   const [rules, setRules] = useState<ColorRule[]>(temperatureDataSource.defaultRules)
 
   const updateRules = (newRules: ColorRule[]) => {
@@ -47,106 +47,111 @@ export default function ColorRulesPanel({ onRulesChange }: ColorRulesPanelProps)
   }
 
   return (
-    <Card className="mb-4">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Palette className="h-5 w-5 text-purple-600" />
-            <CardTitle className="text-sm">Color Rules</CardTitle>
-          </div>
-          <Button onClick={resetToDefault} variant="outline" size="sm" className="text-xs">
-            Reset Default
-          </Button>
+    <footer className="w-full bg-gray-100 border-t border-gray-200 p-6 flex flex-col items-center">
+      {/* Header */}
+      <div className="flex items-center justify-between w-full max-w-6xl mb-4">
+        <div className="flex items-center gap-2">
+          <Palette className="h-5 w-5 text-purple-600" />
+          <h3 className="font-semibold">Color Rules</h3>
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-600">
-          <Thermometer className="h-4 w-4" />
-          <span>Temperature (°C) → Color Mapping</span>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {rules.map((rule) => (
-          <div key={rule.id} className="border rounded-lg p-3 bg-gray-50">
-            <div className="flex items-center gap-2 mb-2">
-              <Input
-                value={rule.label || ''}
-                onChange={(e) => updateRule(rule.id, { label: e.target.value })}
-                placeholder="Rule name"
-                className="h-8 text-xs flex-1"
-              />
+        <Button onClick={resetToDefault} variant="outline" size="sm" className="text-xs">
+          <RefreshCw className="h-3 w-3 mr-1" />
+          Reset
+        </Button>
+      </div>
+
+
+      {/* Rules Grid: 3 columns, responsive */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-5xl mb-8 mx-auto">
+        {rules.map((rule, index) => (
+          <Card key={rule.id} className="border border-gray-200 bg-yellow-50 flex flex-col justify-between min-h-[120px]">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+              <div className="text-xs text-gray-600">Rule #{index + 1}</div>
               <Button
                 onClick={() => removeRule(rule.id)}
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 text-red-600"
+                className="h-6 w-6 p-0 text-red-600"
+                disabled={rules.length <= 1}
               >
                 <Trash2 className="h-3 w-3" />
               </Button>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-600 w-8">If</span>
-              
-              <Select
-                defaultValue={rule.operator}
-                onValueChange={(value) => updateRule(rule.id, { operator: value as ColorRule['operator'] })}
-              >
-                <SelectTrigger className="h-8 w-16 text-xs">
-                  <SelectValue placeholder={rule.operator} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="<">{'<'}</SelectItem>
-                  <SelectItem value="<=">{'\u2264'}</SelectItem>
-                  <SelectItem value="=">=</SelectItem>
-                  <SelectItem value=">=">{'\u2265'}</SelectItem>
-                  <SelectItem value=">">{'>'}</SelectItem>
-                </SelectContent>
-              </Select>
-
+            </CardHeader>
+            <CardContent className="pt-0 flex flex-col gap-2">
               <Input
-                type="number"
-                value={rule.value}
-                onChange={(e) => updateRule(rule.id, { value: parseFloat(e.target.value) || 0 })}
-                className="h-8 w-20 text-xs text-center"
+                value={rule.label || ''}
+                onChange={(e) => updateRule(rule.id, { label: e.target.value })}
+                placeholder="Rule name"
+                className="h-8 text-xs mb-1"
               />
-
-              <span className="text-xs text-gray-600">→</span>
-
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-600 w-6">If</span>
+                <Select 
+                  value={rule.operator} 
+                  onValueChange={(value) => updateRule(rule.id, { operator: value as ColorRule['operator'] })}
+                >
+                  <SelectTrigger className="h-8 w-16 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="<">{'<'}</SelectItem>
+                    <SelectItem value="<=">{'<='}</SelectItem>
+                    <SelectItem value="=">=</SelectItem>
+                    <SelectItem value=">=">{'>='}</SelectItem>
+                    <SelectItem value=">">{'>'}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  type="number"
+                  value={rule.value ?? ''}
+                  onChange={(e) =>
+                    updateRule(rule.id, {
+                      value: e.target.value === '' ? undefined : parseFloat(e.target.value),
+                    })
+                  }
+                  placeholder="10"
+                  className="h-8 w-24 px-2 py-1 text-xs text-center text-black bg-white border border-gray-300"
+                />
+                <span className="text-xs text-gray-600">°C</span>
+                <span className="text-xs text-gray-600 w-6">→</span>
                 <input
                   type="color"
                   value={rule.color}
                   onChange={(e) => updateRule(rule.id, { color: e.target.value })}
                   className="w-8 h-8 rounded border cursor-pointer"
                 />
-                <span className="text-xs text-gray-600 uppercase">{rule.color}</span>
+                <span className="text-xs text-gray-600 uppercase flex-1">{rule.color}</span>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ))}
-
-        <Button onClick={addRule} variant="outline" size="sm" className="w-full h-8 text-xs">
-          <Plus className="h-3 w-3 mr-1" />
-          Add Rule
-        </Button>
-
-        {/* Legend */}
-        <div className="bg-blue-50 p-3 rounded-lg">
-          <div className="text-xs font-medium text-blue-800 mb-2">Current Rules Preview:</div>
-          <div className="space-y-1">
+      </div>
+      {/* Add Rule Button */}
+      <Button onClick={addRule} variant="outline" size="sm" className="w-48 mx-auto mb-8">
+        <Plus className="h-3 w-3 mr-1" />
+        Add Rule
+      </Button>
+      {/* Live Preview Card at the bottom */}
+      <div className="w-full max-w-5xl mx-auto">
+        <Card className="border border-purple-200 bg-purple-50 flex flex-col justify-between min-h-[120px]">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-purple-800">Live Preview</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 flex flex-col gap-2">
             {rules.map((rule) => (
               <div key={rule.id} className="flex items-center gap-2 text-xs">
                 <div 
-                  className="w-3 h-3 rounded-full border"
+                  className="w-4 h-4 rounded-full border border-purple-300"
                   style={{ backgroundColor: rule.color }}
                 />
-                <span className="text-blue-700">
+                <span className="text-purple-700">
                   {rule.operator} {rule.value}°C → {rule.label || 'Unnamed'}
                 </span>
               </div>
             ))}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      </div>
+    </footer>
   )
 }

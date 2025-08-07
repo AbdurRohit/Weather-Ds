@@ -7,6 +7,28 @@ import L from 'leaflet'
 import { useEffect, useState } from 'react'
 import DataSourceDialog from './DataSourceDialog'
 import { polygonStore, PolygonData } from '@/lib/polygonStore'
+import { temperatureDataSource } from '@/lib/colorRules'
+import { useMapEvents } from 'react-leaflet'
+import { useRef } from 'react'
+
+
+// This component will handle click events when drawing is active
+function PolygonClickHandler({
+  isDrawing,
+  addPoint
+}: {
+  isDrawing: boolean
+  addPoint: (point: [number, number]) => void
+}) {
+  useMapEvents({
+    click(e) {
+      if (!isDrawing) return
+      const newPoint: [number, number] = [e.latlng.lat, e.latlng.lng]
+      addPoint(newPoint)
+    }
+  })
+  return null
+}
 
 // Fix leaflet default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -17,15 +39,26 @@ L.Icon.Default.mergeOptions({
 })
 
 // Component to handle polygon drawing and display
-function PolygonManager() {
-  const map = useMap()
+export function PolygonManager() {
+
+  const controlsRef = useRef<HTMLDivElement>(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [currentPoints, setCurrentPoints] = useState<[number, number][]>([])
   const [polygons, setPolygons] = useState<PolygonData[]>([])
   const [showDataSourceDialog, setShowDataSourceDialog] = useState(false)
   const [tempPolygonPoints, setTempPolygonPoints] = useState<[number, number][]>([])
 
-  // Subscribe to polygon store updates
+  useEffect(() => {
+  if (controlsRef.current) {
+    // Prevent clicks on this div from bubbling to the map
+    L.DomEvent.disableClickPropagation(controlsRef.current)
+  }
+}, [])
+
+  useEffect(() => {
+    polygonStore.setColorRules(temperatureDataSource.defaultRules)
+  }, [])
+
   useEffect(() => {
     const unsubscribe = polygonStore.subscribe(() => {
       setPolygons(polygonStore.getPolygons())
@@ -33,32 +66,20 @@ function PolygonManager() {
     return unsubscribe
   }, [])
 
-  // Handle map clicks for polygon drawing
-  useEffect(() => {
-    if (!isDrawing) return
+  const addPoint = (newPoint: [number, number]) => {
+    setCurrentPoints(prev => {
+      const updated = [...prev, newPoint]
+      console.log("New Point Added:", newPoint)
+      console.log("Updated Polygon Points:", updated)
 
-    const handleMapClick = (e: L.LeafletMouseEvent) => {
-      const newPoint: [number, number] = [e.latlng.lat, e.latlng.lng]
-      
-      setCurrentPoints(prev => {
-        const updated = [...prev, newPoint]
-        
-        // Check if we've reached maximum points (12)
-        if (updated.length >= 12) {
-          finishDrawing(updated)
-          return []
-        }
-        
-        return updated
-      })
-    }
+      if (updated.length >= 12) {
+        finishDrawing(updated)
+        return []
+      }
 
-    map.on('click', handleMapClick)
-    
-    return () => {
-      map.off('click', handleMapClick)
-    }
-  }, [isDrawing, map])
+      return updated
+    })
+  }
 
   const startDrawing = () => {
     setIsDrawing(true)
@@ -67,8 +88,6 @@ function PolygonManager() {
 
   const finishDrawing = (points?: [number, number][]) => {
     const finalPoints = points || currentPoints
-    
-    // Validate minimum points (3)
     if (finalPoints.length < 3) {
       alert('Polygon must have at least 3 points!')
       return
@@ -90,7 +109,7 @@ function PolygonManager() {
       id: `polygon_${Date.now()}`,
       coordinates: tempPolygonPoints,
       dataSource,
-      color: '#3B82F6', // Default blue, will be updated based on data later
+      color: '#3B82F6',
       name
     }
 
@@ -100,45 +119,51 @@ function PolygonManager() {
 
   return (
     <>
+      {/* Add map click handler */}
+      <PolygonClickHandler isDrawing={isDrawing} addPoint={addPoint} />
+
       {/* Drawing Controls */}
-      <div className="absolute top-4 left-4 z-[1000] flex flex-col gap-2">
-        {!isDrawing ? (
-          <Button 
-            onClick={startDrawing}
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
-          >
-            <Pencil className="h-4 w-4 mr-1" />
-            Draw Polygon
-          </Button>
-        ) : (
-          <div className="bg-white rounded-lg shadow-md p-3 border">
-            <div className="text-sm font-medium mb-2">Drawing Mode Active</div>
-            <div className="text-xs text-gray-600 mb-3">
-              Points: {currentPoints.length}/12 (min: 3)
-            </div>
-            <div className="flex gap-2">
-              <Button 
-                onClick={() => finishDrawing()}
-                disabled={currentPoints.length < 3}
-                size="sm"
-                className="text-xs"
-              >
-                <Square className="h-3 w-3 mr-1" />
-                Finish
-              </Button>
-              <Button 
-                onClick={cancelDrawing}
-                variant="outline"
-                size="sm"
-                className="text-xs"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        )}
+      <div
+  ref={controlsRef}
+  className="absolute top-4 left-4 z-[1000] flex flex-col gap-2"
+>
+  {!isDrawing ? (
+    <Button 
+      onClick={startDrawing}
+      size="sm"
+      className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+    >
+      <Pencil className="h-4 w-4 mr-1" />
+      Draw Polygon
+    </Button>
+  ) : (
+    <div className="bg-white rounded-lg shadow-md p-3 border">
+      <div className="text-sm font-medium mb-2">Drawing Mode Active</div>
+      <div className="text-xs text-gray-600 mb-3">
+        Points: {currentPoints.length}/12 (min: 3)
       </div>
+      <div className="flex gap-2">
+        <Button 
+          onClick={() => finishDrawing()}
+          disabled={currentPoints.length < 3}
+          size="sm"
+          className="text-xs"
+        >
+          <Square className="h-3 w-3 mr-1" />
+          Finish
+        </Button>
+        <Button 
+          onClick={cancelDrawing}
+          variant="outline"
+          size="sm"
+          className="text-xs"
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
+  )}
+</div>
 
       {/* Render current drawing polygon */}
       {currentPoints.length > 0 && (
@@ -187,12 +212,7 @@ function MapControls() {
     map.setView([22.5726, 88.3639], 13)
   }
 
-  const enableMove = () => {
-    map.dragging.enable()
-    map.scrollWheelZoom.enable()
-    map.doubleClickZoom.enable()
-    map.touchZoom.enable()
-  }
+
 
   useEffect(() => {
     // Lock zoom level as per requirement (2 sq km resolution)
@@ -212,15 +232,7 @@ function MapControls() {
         <Home className="h-4 w-4 mr-1" />
         Center
       </Button>
-      <Button 
-        onClick={enableMove}
-        size="sm"
-        variant="secondary" 
-        className="bg-white hover:bg-gray-100 shadow-md"
-      >
-        <Move className="h-4 w-4 mr-1" />
-        Move
-      </Button>
+ 
     </div>
   )
 }
@@ -230,25 +242,22 @@ export default function MapView() {
   const defaultZoom = 13
 
   return (
-    <div className="map-container rounded-lg overflow-hidden border border-gray-300">
+    <div className="w-full h-full min-h-[500px] min-w-[350px]">
       <MapContainer
         center={defaultCenter}
         zoom={defaultZoom}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', minHeight: 500, minWidth: 350 }}
         zoomControl={false}
         scrollWheelZoom={true}
         dragging={true}
+        className="rounded-lg border border-gray-300"
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        
-        <MapControls />
         <PolygonManager />
+        <MapControls />
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'/>
       </MapContainer>
-      
-    
     </div>
   )
 }

@@ -8,7 +8,11 @@ import { DualRangeSlider } from '@/components/ui/dual-range-slider'
 import { Calendar, RotateCcw } from 'lucide-react'
 import { get30DayWindow, getHoursDiff, addHours, formatDateTime, formatDateOnly } from '@/lib/dates'
 
-export default function Timeline() {
+type TimelineProps = {
+  onTimeChange?: (newSelectedTime: Date, newTimeRange?: { start: Date, end: Date }) => void;
+};
+
+export default function Timeline({ onTimeChange }: TimelineProps) {
   // Use a fixed reference date for initial render to avoid hydration mismatch
   const [referenceDate] = useState(() => {
     const date = new Date();

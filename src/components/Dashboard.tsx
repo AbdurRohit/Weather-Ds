@@ -1,38 +1,69 @@
+"use client"
+
+import { useState } from 'react'
+
 import Timeline from './Timeline'
 import Map from './Map'
+import ColorRulesSidebar from './ColorRulesPanel'
 import PolygonSidebar from './PolygonSidebar'
+import { ColorRule } from '@/lib/colorRules'
+import { polygonStore } from '@/lib/polygonStore'
 
 export default function Dashboard() {
+  const [selectedTime, setSelectedTime] = useState(new Date())
+  const [timeRange, setTimeRange] = useState<{ start: Date, end: Date } | undefined>()
+
+  const handleTimeChange = (time: Date, range?: { start: Date, end: Date }) => {
+    setSelectedTime(time)
+    setTimeRange(range)
+  }
+
+  const handleColorRulesChange = (rules: ColorRule[]) => {
+    polygonStore.setColorRules(rules)
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Timeline Section */}
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Timeline Section - Top */}
       <div className="p-4 pb-0">
-        <div className="max-w-7xl mx-auto">
-          <Timeline />
+        <div className="max-w-6xl mx-auto">
+          <Timeline onTimeChange={handleTimeChange} />
         </div>
       </div>
-      
-      {/* Map + Sidebar Section */}
-      <div className="p-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center gap-2">
-                <div className="text-xl">🗺️</div>
-                <h2 className="text-lg font-semibold">Interactive Map & Polygon Drawing</h2>
+
+      {/* Main Content: Map and Sidebar */}
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="w-full max-w-6xl flex-1 grid grid-cols-12 gap-4 px-4">
+          {/* Map Section */}
+          <div className="col-span-9 flex flex-col">
+            <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+              <div className="p-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="text-xl">🗺️</div>
+                  <div>
+                    <h2 className="text-lg font-semibold">Weather Analysis Dashboard</h2>
+                    <p className="text-sm text-gray-600">
+                      Configure rules → Draw polygons → Analyze weather patterns
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
+                  Phases 4-6 Complete ✓
+                </span>
               </div>
-            </div>
-            
-            <div className="flex">
-              {/* Map Area */}
-              <div className="flex-1 p-4">
+              <div className="flex-1 p-4 bg-gray-25">
                 <Map />
               </div>
-              
-              {/* Sidebar */}
-              <PolygonSidebar />
             </div>
           </div>
+          {/* Polygon Sidebar */}
+          <div className="col-span-3">
+            <PolygonSidebar selectedTime={selectedTime} timeRange={timeRange} />
+          </div>
+        </div>
+        {/* Color Rules Panel at the bottom */}
+        <div className="w-full max-w-6xl mt-4">
+          <ColorRulesSidebar onRulesChange={handleColorRulesChange} />
         </div>
       </div>
     </div>
