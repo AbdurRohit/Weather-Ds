@@ -120,3 +120,25 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* Add Leaflet CSS */
+@import 'leaflet/dist/leaflet.css';
+
+/* Fix leaflet icons in Next.js */
+.leaflet-default-icon-path {
+  background: none;
+}
+
+/* Make sure map takes full height */
+.map-container {
+  height: 500px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix leaflet marker icons */
+.leaflet-marker-icon {
+  background: none;
+}

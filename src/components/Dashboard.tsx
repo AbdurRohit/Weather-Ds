@@ -1,21 +1,37 @@
 import Timeline from './Timeline'
+import Map from './Map'
+import PolygonSidebar from './PolygonSidebar'
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50">
       {/* Timeline Section */}
-      <div className="max-w-4xl mx-auto mb-6">
-        <Timeline />
+      <div className="p-4 pb-0">
+        <div className="max-w-7xl mx-auto">
+          <Timeline />
+        </div>
       </div>
       
-      {/* Map Placeholder */}
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-blue-100 border-2 border-dashed border-blue-300 rounded-lg p-12 text-center">
-          <div className="text-blue-600">
-            <div className="text-4xl mb-4">🗺️</div>
-            <h3 className="text-xl font-semibold mb-2">Map Section</h3>
-            <p className="text-sm opacity-75">Interactive map coming in Phase 3!</p>
-            <p className="text-xs mt-2 opacity-50">Timeline controls are ready above ↑</p>
+      {/* Map + Sidebar Section */}
+      <div className="p-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center gap-2">
+                <div className="text-xl">🗺️</div>
+                <h2 className="text-lg font-semibold">Interactive Map & Polygon Drawing</h2>
+              </div>
+            </div>
+            
+            <div className="flex">
+              {/* Map Area */}
+              <div className="flex-1 p-4">
+                <Map />
+              </div>
+              
+              {/* Sidebar */}
+              <PolygonSidebar />
+            </div>
           </div>
         </div>
       </div>
