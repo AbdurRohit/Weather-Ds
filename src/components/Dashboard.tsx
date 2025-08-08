@@ -47,9 +47,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-                <span className="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
-                  Phases 4-6 Complete ✓
-                </span>
+               
               </div>
               <div className="flex-1 p-4 bg-gray-25">
                 <MapView selectedTime={selectedTime} timeRange={timeRange} />

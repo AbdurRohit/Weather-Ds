@@ -2,7 +2,7 @@
 
 import { MapContainer, TileLayer, useMap, Polygon } from 'react-leaflet'
 import { Button } from '@/components/ui/button'
-import { Home, Move, Pencil, Square } from 'lucide-react'
+import { Home, Pencil, Square } from 'lucide-react'
 import L from 'leaflet'
 import { useEffect, useState } from 'react'
 import DataSourceDialog from './DataSourceDialog'
@@ -250,7 +250,11 @@ export default function LeafletMapComponent({ selectedTime, timeRange }: Leaflet
     
     // Fix leaflet default marker icons
     if (typeof window !== 'undefined') {
-      delete (L.Icon.Default.prototype as any)._getIconUrl
+      // Define the type for Icon.Default.prototype
+      interface IconDefault extends L.Icon.Default {
+        _getIconUrl?: string;
+      }
+      delete (L.Icon.Default.prototype as IconDefault)._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
         iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',

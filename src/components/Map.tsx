@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 
 // Dynamically import map to avoid SSR issues

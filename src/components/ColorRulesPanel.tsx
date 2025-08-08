@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Trash2, Palette, Thermometer, RefreshCw } from 'lucide-react'
+import { Plus, Trash2, Palette, RefreshCw } from 'lucide-react'
 import { ColorRule, temperatureDataSource } from '@/lib/colorRules'
 
 interface ColorRulesSidebarProps {

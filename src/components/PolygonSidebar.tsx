@@ -59,7 +59,7 @@ export default function PolygonSidebar({ selectedTime, timeRange }: PolygonSideb
       {polygons.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-gray-500">
           <p className="text-sm">No polygons drawn yet</p>
-          <p className="text-xs text-gray-400 mt-1">Click "Draw Polygon" to start</p>
+          <p className="text-xs text-gray-400 mt-1">Click &quot;Draw Polygon&quot; to start</p>
         </div>
       ) : (
         <div className="flex-1 space-y-3 overflow-y-auto pr-1">
