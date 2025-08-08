@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from 'react'
-
 import Timeline from './Timeline'
 import MapView from './MapView'
 import ColorRulesSidebar from './ColorRulesPanel'

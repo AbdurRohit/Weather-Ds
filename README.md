@@ -6,7 +6,7 @@
 
 A real-time weather analysis dashboard that allows users to draw polygons on a map and visualize temperature data. Features include temperature-based color coding, timeline controls, and dynamic data updates.
 
-🌐 [Live Demo](https://mwv-dashboard.vercel.app/)
+🌐 [Live Demo](https://weather-scanner101.netlify.app/)
 
 ## Features
 
