@@ -21,7 +21,6 @@ A real-time weather analysis dashboard that allows users to draw polygons on a m
 <table>
   <tr>
     <td>
-    ![alt text](image.png)
       <img src="./assets/image.png" alt="Dashboard Overview" width="100%"/>
       <em>Dashboard Overview</em>
     </td>
