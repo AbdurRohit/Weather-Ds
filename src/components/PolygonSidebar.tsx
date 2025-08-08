@@ -48,7 +48,7 @@ export default function PolygonSidebar({ selectedTime, timeRange }: PolygonSideb
   }
 
   return (
-    <aside className="h-full w-full bg-white border-l border-gray-200 p-4 flex flex-col">
+    <aside className="h-155 w-2xs bg-white border-l overflow-hidden border-gray-200 p-4 flex flex-col">
       <div className="flex items-center gap-2 mb-4">
         <MapPin className="h-5 w-5 text-blue-600" />
         <h3 className="font-semibold">Drawn Polygons</h3>
