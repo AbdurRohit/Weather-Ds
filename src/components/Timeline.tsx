@@ -40,11 +40,17 @@ export default function Timeline({ onTimeChange }: TimelineProps) {
     const hours = value[0];
     const newDate = hoursToDate(hours);
     setSelectedTime(newDate);
+    onTimeChange?.(newDate); // Call the callback with new time
   }
 
   // Handle range change
   const handleRangeChange = (value: SetStateAction<number[]>) => {
-    setTimeRange(value)
+    setTimeRange(value);
+    if (Array.isArray(value)) {
+      const startDate = hoursToDate(value[0]);
+      const endDate = hoursToDate(value[1]);
+      onTimeChange?.(startDate, { start: startDate, end: endDate });
+    }
   }
 
   // Reset to current time

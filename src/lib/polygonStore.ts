@@ -35,31 +35,12 @@ class PolygonStore {
   }
 
   async addPolygon(polygon: PolygonData) {
-    // Add polygon to store
-    this.polygons.push({ ...polygon, isLoading: true })
+    // Add polygon to store with loading state
+    const newPolygon = { ...polygon, isLoading: true }
+    this.polygons.push(newPolygon)
     this.notify()
-
-    // Fetch initial temperature data
-    const now = new Date()
-    try {
-      const temperature = await weatherApi.getPolygonTemperature(
-        polygon.coordinates,
-        now
-      )
-      
-      if (temperature !== null) {
-        this.updatePolygon(polygon.id, {
-          currentTemperature: temperature,
-          lastUpdated: now,
-          isLoading: false
-        })
-        console.log(`Polygon ${polygon.id} added with initial temperature:`, temperature);
-        
-      }
-    } catch (error) {
-      console.error('Failed to fetch initial temperature:', error)
-      this.updatePolygon(polygon.id, { isLoading: false })
-    }
+    
+    console.log("polygonStore: adding polygon @addPolygon:", newPolygon);
   }
 
   removePolygon(id: string) {
@@ -83,6 +64,8 @@ class PolygonStore {
     const polygon = this.polygons.find(p => p.id === id)
     if (!polygon) return
 
+    console.log(`Updating weather for polygon ${id} at time:`, selectedTime);
+    
     // Set loading state
     this.updatePolygon(id, { isLoading: true })
 
@@ -90,23 +73,26 @@ class PolygonStore {
       let temperature: number | null = null
 
       if (timeRange) {
-        // Range selection - get average
+        console.log(`Fetching temperature range for polygon ${id}:`, timeRange);
         temperature = await weatherApi.getPolygonTemperatureRange(
           polygon.coordinates, 
           timeRange.start, 
           timeRange.end
         )
       } else {
-        // Single time selection
+        console.log(`Fetching temperature for polygon ${id} at:`, selectedTime);
         temperature = await weatherApi.getPolygonTemperature(
           polygon.coordinates, 
           selectedTime
         )
       }
 
+      console.log(`Received temperature for polygon ${id}:`, temperature);
+
       if (temperature !== null) {
         // Calculate color based on temperature and current rules
         const color = ColorRuleEngine.evaluateRules(temperature, this.colorRules)
+        console.log(`Updating polygon ${id} with temperature:`, temperature, 'color:', color);
         
         this.updatePolygon(id, {
           currentTemperature: temperature,
@@ -115,6 +101,7 @@ class PolygonStore {
           isLoading: false
         })
       } else {
+        console.log(`No temperature data available for polygon ${id}`);
         // No data available - use default gray color
         this.updatePolygon(id, {
           currentTemperature: undefined,
@@ -127,7 +114,8 @@ class PolygonStore {
       console.error(`Failed to update weather for polygon ${id}:`, error)
       this.updatePolygon(id, {
         isLoading: false,
-        color: '#6B7280' // Gray for error state
+        color: '#6B7280', // Gray for error state
+        currentTemperature: undefined
       })
     }
   }

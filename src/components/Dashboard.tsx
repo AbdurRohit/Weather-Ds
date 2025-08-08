@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import Timeline from './Timeline'
-import Map from './Map'
+import MapView from './MapView'
 import ColorRulesSidebar from './ColorRulesPanel'
 import PolygonSidebar from './PolygonSidebar'
 import { ColorRule } from '@/lib/colorRules'
@@ -52,7 +52,7 @@ export default function Dashboard() {
                 </span>
               </div>
               <div className="flex-1 p-4 bg-gray-25">
-                <Map />
+                <MapView selectedTime={selectedTime} timeRange={timeRange} />
               </div>
             </div>
           </div>

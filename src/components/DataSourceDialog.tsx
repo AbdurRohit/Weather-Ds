@@ -13,7 +13,7 @@ interface DataSourceDialogProps {
 }
 
 export default function DataSourceDialog({ isOpen, onClose, onSelect }: DataSourceDialogProps) {
-  const [polygonName, setPolygonName] = useState('')
+  const [polygonName, setPolygonName] = useState('') 
 
   if (!isOpen) return null
 
@@ -62,10 +62,6 @@ export default function DataSourceDialog({ isOpen, onClose, onSelect }: DataSour
                 </div>
               </Button>
 
-              {/* Bonus: Add more data sources here later */}
-              <div className="text-xs text-gray-500 text-center py-2">
-                More data sources coming in bonus features...
-              </div>
             </div>
           </div>
         </CardContent>

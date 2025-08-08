@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Trash2, MapPin, Thermometer } from 'lucide-react'
 import { polygonStore, PolygonData } from '@/lib/polygonStore'
-import { PolygonManager } from './MapView'
-import { MapContainer } from 'react-leaflet'
+
 
 type PolygonSidebarProps = {
   selectedTime: Date;

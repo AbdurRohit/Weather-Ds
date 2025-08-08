@@ -51,13 +51,17 @@ class WeatherApiService {
     coordinates: [number, number][],
     selectedTime: Date
   ): Promise<number | null> {
+    console.log('WeatherAPI: Getting temperature for coordinates:', coordinates);
+    
     // Calculate polygon centroid for API call
     const centroid = this.calculateCentroid(coordinates)
+    console.log('WeatherAPI: Calculated centroid:', centroid);
     
     // Format dates for API
     const date = selectedTime.toISOString().split('T')[0]
     const startDate = date
     const endDate = date
+    console.log('WeatherAPI: Fetching data for date:', date);
 
     const data = await this.fetchWeatherData(
       centroid.lat, 
