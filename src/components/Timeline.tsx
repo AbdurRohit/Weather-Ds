@@ -27,7 +27,7 @@ export default function Timeline({ onTimeChange }: TimelineProps) {
   // Simple state
   const [selectedTime, setSelectedTime] = useState(referenceDate)
   const [timeRange, setTimeRange] = useState([0, 24]) // Default 24 hour range
-  const [isRangeMode, setIsRangeMode] = useState(false)
+  const [isRangeMode, setIsRangeMode] = useState(true)
 
   // Convert hours to actual date
   const hoursToDate = (hours: number) => addHours(timeWindow.start, hours)
